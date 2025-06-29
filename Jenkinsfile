@@ -18,14 +18,15 @@ node{
     stage('git code checkout'){
         try{
             echo 'checkout the code from git repository'
-            git 'https://github.com/shubhamkushwah123/star-agile-insurance-project.git'
+            git 'https://github.com/Rohitpotdar01/star-agile-insurance-project.git
+'
         }
         catch(Exception e){
             echo 'Exception occured in Git Code Checkout Stage'
             currentBuild.result = "FAILURE"
             emailext body: '''Dear All,
             The Jenkins job ${JOB_NAME} has been failed. Request you to please have a look at it immediately by clicking on the below link. 
-            ${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} is failed', to: 'shubham@gmail.com'
+            ${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} is failed', to: 'Rohitpotdat55@gmail.com'
         }
     }
     
@@ -41,7 +42,7 @@ node{
     
     stage('Containerize the application'){
         echo 'Creating Docker image'
-        sh "${dockerCMD} build -t shubhamkushwah123/insure-me:${tagName} ."
+        sh "${dockerCMD} build -t Rohit123/insure-me:${tagName} ."
     }
     
     stage('Pushing it ot the DockerHub'){
