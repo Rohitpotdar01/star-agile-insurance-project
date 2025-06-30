@@ -19,7 +19,7 @@ node{
         try{
             echo 'checkout the code from git repository'
             git 'https://github.com/Rohitpotdar01/star-agile-insurance-project.git'
-'
+
         }
         catch(Exception e){
             echo 'Exception occured in Git Code Checkout Stage'
