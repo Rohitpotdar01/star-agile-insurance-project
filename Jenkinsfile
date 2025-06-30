@@ -23,9 +23,8 @@ node('slave-1') {
             echo 'Exception occured in Git Code Checkout Stage'
             currentBuild.result = "FAILURE"
             emailext body: '''Dear All,
-The Jenkins job ${JOB_NAME} has been failed. Request you to please have a look at it immediately by clicking on the below link. 
-${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} is failed', to: 'Rohitpotdat55@gmail.com'
-            error("Stopping build due to Git failure")
+            The Jenkins job ${JOB_NAME} has been failed. Request you to please have a look at it immediately by clicking on the below link. 
+            ${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} is failed', to: 'Rohitpotdat55@gmail.com'
         }
     }
 
@@ -35,16 +34,7 @@ ${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} is failed', to: 'Rohi
     }
 
     stage('publish test reports') {
-        publishHTML([
-            allowMissing: false, 
-            alwaysLinkToLastBuild: false, 
-            keepAll: false, 
-            reportDir: '/var/lib/jenkins/workspace/Capstone-Project-Live-Demo/target/surefire-reports', 
-            reportFiles: 'index.html', 
-            reportName: 'HTML Report', 
-            reportTitles: '', 
-            useWrapperFileDirectly: true
-        ])
+        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '/var/lib/jenkins/workspace/Capstone-Project-Live-Demo/target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
     }
 
     stage('Containerize the application') {
@@ -53,32 +43,17 @@ ${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} is failed', to: 'Rohi
     }
 
     stage('Pushing it to the DockerHub') {
-        echo 'Pushing the docker image to DockerHub'
-        withCredentials([usernamePassword(credentialsId: 'dock-password', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-            sh """
-                ${dockerCMD} login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-                ${dockerCMD} push rohitpotdar/insure-me:${tagName}
-            """
-        }
+    echo 'Pushing the docker image to DockerHub'
+    withCredentials([usernamePassword(credentialsId: 'dock-password', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+        sh """
+            ${dockerCMD} login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            ${dockerCMD} push rohitpotdar/insure-me:${tagName}
+        """
     }
+}
+
 
     stage('Configure and Deploy to the test-server') {
-        try {
-            ansiblePlaybook(
-                become: true,
-                credentialsId: 'ansible-key',
-                disableHostKeyChecking: true,
-                installation: 'ansible',
-                inventory: '/etc/ansible/hosts',
-                playbook: 'ansible-playbook.yml'
-            )
-        } catch (Exception e) {
-            echo "Ansible playbook execution failed: ${e.getMessage()}"
-            currentBuild.result = "FAILURE"
-            emailext body: '''Dear All,
-The Jenkins job ${JOB_NAME} has failed during Ansible deployment. Please check immediately:
-${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} failed', to: 'Rohitpotdat55@gmail.com'
-            error("Failing the build due to Ansible failure")
-        }
+        ansiblePlaybook become: true, credentialsId: 'ansible-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml'
     }
 }
