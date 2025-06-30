@@ -43,12 +43,15 @@ node('slave-1') {
     }
 
     stage('Pushing it to the DockerHub') {
-        echo 'Pushing the docker image to DockerHub'
-        withCredentials([string(credentialsId: 'dock-password', variable: 'dockerHubPassword')]) {
-            sh "${dockerCMD} login -u rohitpotdar -p ${dockerHubPassword}"
-            sh "${dockerCMD} push rohitpotdar/insure-me:${tagName}"
-        }
+    echo 'Pushing the docker image to DockerHub'
+    withCredentials([usernamePassword(credentialsId: 'dock-password', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+        sh """
+            ${dockerCMD} login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            ${dockerCMD} push rohitpotdar/insure-me:${tagName}
+        """
     }
+}
+
 
     stage('Configure and Deploy to the test-server') {
         ansiblePlaybook become: true, credentialsId: 'ansible-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml'
