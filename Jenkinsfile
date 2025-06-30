@@ -12,13 +12,13 @@ node{
         mavenCMD = "${mavenHome}/bin/mvn"
         docker = tool name: 'docker' , type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
         dockerCMD = "${docker}/bin/docker"
-        tagName="3.0"
+        tagName="insure-me"
     }
     
     stage('git code checkout'){
         try{
             echo 'checkout the code from git repository'
-            git 'https://github.com/Rohitpotdar01/star-agile-insurance-project.git
+            git 'https://github.com/Rohitpotdar01/star-agile-insurance-project.git'
 '
         }
         catch(Exception e){
@@ -42,17 +42,17 @@ node{
     
     stage('Containerize the application'){
         echo 'Creating Docker image'
-        sh "${dockerCMD} build -t Rohit123/insure-me:${tagName} ."
+        sh "${dockerCMD} build -t rohitpotdar/insure-me:${tagName} ."
     }
     
     stage('Pushing it ot the DockerHub'){
         echo 'Pushing the docker image to DockerHub'
         withCredentials([string(credentialsId: 'dock-password', variable: 'dockerHubPassword')]) {
-        sh "${dockerCMD} login -u shubhamkushwah123 -p ${dockerHubPassword}"
-        sh "${dockerCMD} push shubhamkushwah123/insure-me:${tagName}"
+        sh "${dockerCMD} login -u rohitpotdar -p ${dockerhubpassword}"
+        sh "${dockerCMD} push rohitpotdar/insure-me:${tagname}"
             
         }
-        
+    }
     stage('Configure and Deploy to the test-server'){
         ansiblePlaybook become: true, credentialsId: 'ansible-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml'
     }
