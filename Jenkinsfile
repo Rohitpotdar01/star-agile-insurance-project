@@ -1,4 +1,4 @@
-node {
+node('slave-1') {
 
     def mavenHome
     def mavenCMD
