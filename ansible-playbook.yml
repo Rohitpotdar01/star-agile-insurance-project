@@ -1,20 +1,48 @@
-- name : Configure Docker on EC2 Instances
-  hosts : all
+- name: Configure & Deploy Insure-Me on EC2
+  hosts: all
   become: true
-  connection : ssh
-  tasks : 
-  - name: updating apt
-    command : sudo apt-get update
+  connection: ssh
 
-  - name : Install Docker
-    command : sudo apt-get install -y docker.io
-    become : yes
-    become_user : root
+  vars:
+    image_name: rohitpotdar/insure-me
+    image_tag: insure-me
+    container_name: insure-me
+    host_port: 8084
+    container_port: 8081
 
-  - name : Start Docker Service
-    command : sudo systemctl start docker
-    become : yes
-    become_user : root
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
 
-  - name: Deploy Docker Container
-    command: docker run -itd -p 8084:8081 rohitpotdar/insure-me:insure-me
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Ensure Docker service is running
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull the Insure‑Me image
+      docker_image:
+        name: "{{ image_name }}"
+        tag: "{{ image_tag }}"
+        source: pull
+
+    - name: Remove old container (if exists)
+      docker_container:
+        name: "{{ container_name }}"
+        state: absent
+        force_kill: true
+
+    - name: Run the Insure‑Me container
+      docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}:{{ image_tag }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "{{ host_port }}:{{ container_port }}"
