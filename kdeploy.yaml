@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: rohit-deploy
   labels:
-    app: rohit-deploy
+    app: insure-me
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: rohit-deploy
+      app: insure-me
   template:
     metadata:
       labels:
-        app: rohit-deploy
+        app: insure-me
     spec:
       containers:
       - name: rohit-container
@@ -23,15 +23,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: rohit-np-service
+  name: insure-me-service
   labels:
-    app: rohit-deploy
+    app: insure-me
 spec:
   selector:
-    app: rohit-deploy
-
+    app: insure-me
   type: NodePort
   ports:
-  - nodePort: 31028
-    port: 8080
+  - port: 8080
     targetPort: 8080
+    nodePort: 31028
+
