@@ -8,14 +8,14 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: rohit-deploy-app
+      app: rohit-deploy
   template:
     metadata:
       labels:
-        app: rohit-deploy-app
+        app: rohit-deploy
     spec:
       containers:
-      - name: rohit_container
+      - name: rohit-container
         image: rohitpotdar/insure-me
         ports:
         - containerPort: 8080
@@ -25,10 +25,10 @@ kind: Service
 metadata:
   name: rohit-np-service
   labels:
-    app: rohit-deploy-app
+    app: rohit-deploy
 spec:
   selector:
-    app: loksai-eta-deploy-lbl
+    app: rohit-deploy
 
   type: NodePort
   ports:
