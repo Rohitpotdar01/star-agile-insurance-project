@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rohit-deploy
+  labels:
+    app: rohit-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: rohit-deploy-app
+  template:
+    metadata:
+      labels:
+        app: rohit-deploy-app
+    spec:
+      containers:
+      - name: rohit_container
+        image: rohitpotdar/insure-me
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rohit-np-service
+  labels:
+    app: rohit-deploy-app
+spec:
+  selector:
+    app: loksai-eta-deploy-lbl
+
+  type: NodePort
+  ports:
+  - nodePort: 31028
+    port: 8080
+    targetPort: 8080
